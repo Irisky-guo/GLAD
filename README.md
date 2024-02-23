@@ -1,5 +1,6 @@
 # GLAD
-[TITS-2024] Global-local MAV Detection
+[TITS-2024] Global-Local MAV Detection
+
 This is the repository for the paper "Global-Local MAV Detection under Challenging Conditions based on Appearance and Motion", which has been conditionally accepted by IEEE Transactions on Intelligent Transportation Systems.
 ![Uploading image.png…]()
 
