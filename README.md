@@ -6,3 +6,5 @@ This is the repository for the paper "Global-Local MAV Detection under Challengi
 
 ARD-MAV dataset:
 Baidu Netdisk: https://pan.baidu.com/s/1qROfavqy_auzfq0mqjiJ3A Code: sr7f
+
+The Code of this paper is coming soon!
