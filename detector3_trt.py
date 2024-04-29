@@ -9,14 +9,14 @@ import pycuda.driver as cuda
 TRT_LOGGER = trt.Logger()
 INPUT_W = 640
 INPUT_H = 640
-CONF_THRESH = 0.1
+CONF_THRESH = 0.5
 IOU_THRESHOLD = 0.4
 
 # load coco labels
 categories = ["person", "bicycle", "car"]
 
 
-class Detector2:
+class Detector3:
 
     def __init__(self, engine_file_path):
         self.img_size = 640
@@ -235,8 +235,8 @@ class Detector2:
         #
         results_trt = []
         final_box = []
-        ref_score = CONF_THRESH
-        ref_dist = 50
+        # ref_score = 0.45
+        ref_dist = 10
         for i in range(len(result_boxes)):
             x1, y1 = int(result_boxes[i][0]), int(result_boxes[i][1])
             x2, y2 = int(result_boxes[i][2]), int(result_boxes[i][3])
@@ -247,14 +247,14 @@ class Detector2:
             y_now = (y1 + y2) / 2
             distance = self.dist(x_prev, y_prev, x_now, y_now)
             # print('distance is: ', distance)
-            results_trt.append([x1, y1, x2, y2, label, conf, distance])
-            if conf > ref_score and distance < ref_dist:
-                final_box = np.array([x1, y1, x2 - x1, y2 - y1])
-                ref_score = conf
-                ref_dist = distance
-            # if distance < ref_dist:
+            # results_trt.append([x1, y1, x2, y2, label, conf, distance])
+            # if conf > ref_score and distance < ref_dist:
             #     final_box = np.array([x1, y1, x2 - x1, y2 - y1])
+            #     ref_score = conf
             #     ref_dist = distance
+            if distance < ref_dist:
+                final_box = np.array([x1, y1, x2 - x1, y2 - y1])
+                ref_dist = distance
             # if conf > ref_score:
             #     final_box = np.array([x1, y1, x2 - x1, y2 - y1])
             #     ref_score = conf

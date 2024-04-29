@@ -1,6 +1,6 @@
 import cv2
 
-vc = cv2.VideoCapture('./videos/phantom16.mp4')
+vc = cv2.VideoCapture('/home/user-guo/data/MGAD_exp0/camera1/DJI_0001_S.MP4')
 c = 0
 rval = vc.isOpened()
 
@@ -11,7 +11,7 @@ while rval:
         if c % 1 == 0:
             name0 = str(c)
             name = name0.zfill(4)
-            cv2.imwrite('./images/phantom16/' + 'phantom16_' + name + '.jpg', frame)
+            cv2.imwrite('/home/user-guo/data/MGAD_exp0/images/phantom93/' + 'phantom93_' + name + '.jpg', frame)
             print('extract frame: ', name)
         else:
             continue

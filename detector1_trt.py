@@ -1,5 +1,11 @@
-# local YOLO detector
-
+# -*- coding: utf-8 -*-
+#!/usr/bin/python3
+"""
+Created on 2023/1/1
+@Author: Guo Hanqing
+@Email : guohanqing@westlake.edu.cn
+@File : detector_trt.py
+"""
 import cv2
 import numpy as np
 import tensorrt as trt
@@ -9,18 +15,18 @@ import pycuda.driver as cuda
 TRT_LOGGER = trt.Logger()
 INPUT_W = 640
 INPUT_H = 640
-CONF_THRESH = 0.1
+CONF_THRESH = 0.5
 IOU_THRESHOLD = 0.4
 
 # load coco labels
 categories = ["person", "bicycle", "car"]
 
 
-class Detector2:
+class Detector1:
 
     def __init__(self, engine_file_path):
         self.img_size = 640
-        self.threshold = CONF_THRESH
+        self.threshold = 0.8
         self.stride = 1
 
         # Create a Context on this device,
@@ -66,8 +72,7 @@ class Detector2:
         self.cuda_outputs = cuda_outputs
         self.bindings = bindings
 
-    def detect(self, im, x_prev, y_prev):
-    # def detect(self, im):
+    def detect(self, im):
         # threading.Thread.__init__(self)
         # Make self the active context, pushing it on top of the context stack.
         self.cfx.push()
@@ -97,8 +102,7 @@ class Detector2:
         # Here we use the first row of output in that batch_size = 1
         trt_outputs = host_outputs[0]
         # Do postprocess
-        results_trt = self.post_process(trt_outputs, origin_h, origin_w, x_prev, y_prev)
-        # results_trt = self.post_process(trt_outputs, origin_h, origin_w)
+        results_trt = self.post_process(trt_outputs, origin_h, origin_w)
 
         return results_trt
 
@@ -181,12 +185,7 @@ class Detector2:
         y[:, 3] = y[:, 3] - y[:, 1]
         return y
 
-    def dist(self, x1, y1, x2, y2):
-        distance = np.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
-        return distance
-
-    def post_process(self, output, origin_h, origin_w, x_prev, y_prev):
-    # def post_process(self, output, origin_h, origin_w):
+    def post_process(self, output, origin_h, origin_w):
         """
         description: postprocess the prediction
         param:
@@ -235,30 +234,17 @@ class Detector2:
         #
         results_trt = []
         final_box = []
-        ref_score = CONF_THRESH
-        ref_dist = 50
+        ref_score = 0.5
         for i in range(len(result_boxes)):
             x1, y1 = int(result_boxes[i][0]), int(result_boxes[i][1])
             x2, y2 = int(result_boxes[i][2]), int(result_boxes[i][3])
             cid = result_classid[i][0]
             label = categories[int(cid)]
             conf = result_scores[i][0]
-            x_now = (x1 + x2) / 2
-            y_now = (y1 + y2) / 2
-            distance = self.dist(x_prev, y_prev, x_now, y_now)
-            # print('distance is: ', distance)
-            results_trt.append([x1, y1, x2, y2, label, conf, distance])
-            if conf > ref_score and distance < ref_dist:
+            results_trt.append((x1, y1, x2, y2, label, conf))
+            if conf > ref_score:
                 final_box = np.array([x1, y1, x2 - x1, y2 - y1])
                 ref_score = conf
-                ref_dist = distance
-            # if distance < ref_dist:
-            #     final_box = np.array([x1, y1, x2 - x1, y2 - y1])
-            #     ref_dist = distance
-            # if conf > ref_score:
-            #     final_box = np.array([x1, y1, x2 - x1, y2 - y1])
-            #     ref_score = conf
-
         return final_box
 
     def destroy(self):

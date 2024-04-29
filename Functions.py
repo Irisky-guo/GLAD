@@ -111,7 +111,7 @@ def motion_compensate_local(frame1, frame2):
     good_new = pts_cur[st == 1]  # 当前帧中的跟踪点
     good_old = pts_prev[st == 1]  # 前一帧中的跟踪点
     # print('local points num:', len(good_old))
-    if len(good_old) < 9:
+    if len(good_old) < 18:
         homography_matrix = np.array([[0.999, 0, 0], [0, 0.999, 0], [0, 0, 1]])
     else:
         homography_matrix, status = cv2.findHomography(good_new, good_old, cv2.RANSAC, 3.0)
@@ -187,7 +187,6 @@ def frame_stablize(frame1, frame2):
     homography_matrix, status = cv2.findHomography(points_new, points_old, cv2.RANSAC, 3.0)
     img_compensate = cv2.warpPerspective(frame2, homography_matrix, (width, height), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
     homo_inv = np.linalg.inv(homography_matrix)
-
     # # 使用仿射变换矩阵进行图像稳像
     # # Find affine transformation matrix
     # m, _ = cv2.estimateAffinePartial2D(points_new, points_old, maxIters=200, ransacReprojThreshold=3)
@@ -212,7 +211,7 @@ def frame_stablize(frame1, frame2):
     # img_compensate = cv2.warpAffine(frame2, m, (width, height))
     # m_inv = np.linalg.inv(m)
 
-    return img_compensate, homo_inv
+    return homo_inv
 
 
 def enlargebox(x, y, w, h, a, width, height):
@@ -420,18 +419,6 @@ def box_select(boxes1):
     return boxes1
 
 
-def resnet34_infer(src):
-    # net = cv2.dnn.readNetFromONNX('/home/user-guo/Downloads/video/20220731/phantom_100m/far_sky/vgg16_1.onnx')
-    net = cv2.dnn.readNetFromONNX('./mydataset/resnet34_1.onnx')
-    size = 224
-    image = cv2.resize(src, [size, size])
-    blob = cv2.dnn.blobFromImage(image, 1.0, (size, size), (0, 0, 0), False)
-    net.setInput(blob)
-    probs = net.forward()
-    index = np.argmax(probs)
-    return index
-
-
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -484,7 +471,7 @@ def Mynet_infer(src):
 
     model = Net()
     # load model weights
-    model_weight_path = "/home/user-guo/Documents/GLAD/weights/Net_best_2.pth"
+    model_weight_path = "./weights/Net_best.pth"
     model.load_state_dict(torch.load(model_weight_path, map_location=torch.device('cpu')))
     model.eval()
     with torch.no_grad():
@@ -495,20 +482,6 @@ def Mynet_infer(src):
         # print(predict_cla)
 
     return predict_cla
-
-
-def Net_infer(src):
-    size = 32
-    image = cv2.resize(src, (size, size))
-
-    net = cv2.dnn.readNetFromONNX('/home/user-guo/Documents/YOLOv5_MOD_Tracking/weights/Net.onnx')
-
-    blob = cv2.dnn.blobFromImage(image, 1.0, (size, size), (0, 0, 0), False)
-    net.setInput(blob)
-    probs = net.forward()
-    index = np.argmax(probs)
-
-    return index
 
 
 def readGTbox(xml_file):

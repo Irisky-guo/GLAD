@@ -4,7 +4,6 @@ import numpy as np
 from Functions import box_select
 from Functions import enlargebox
 from Functions import Mynet_infer
-from Functions import Net_infer
 from Functions import motion_compensate
 from Functions import motion_compensate_local
 from Functions import cal_center_distance
@@ -130,7 +129,6 @@ def MOD2_global(frame1, frame2):
 
         MOD_crop = frame1[y1:y1 + h1, x1:x1 + w1, :]
         index = Mynet_infer(MOD_crop)
-        # index = Net_infer(MOD_crop)
         if index == 1:
             rect_final = (x1, y1, w1, h1)
             # rect_candidate0 = [x1, y1, w1, h1]

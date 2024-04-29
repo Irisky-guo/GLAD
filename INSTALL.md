@@ -1,45 +1,32 @@
 # Installation
 
-This document contains detailed instructions for installing dependencies for SiamBAN. We recommand using the [install.sh](install.sh). The code is tested on an Ubuntu 18.04 system with Nvidia GPU (We recommand 1080TI / TITAN V).
+This document contains detailed instructions for installing dependencies for GLAD. The code is tested on an Ubuntu 18.04 system with Nvidia GeForce RTX 3070.
 
 ### Requirments
 * Conda with Python 3.7
-* Nvidia GPU
-* PyTorch 1.2.0
-* pyyaml
-* yacs
-* tqdm
-* matplotlib
-* OpenCV
-
-## Step-by-step instructions
+* PyTorch 1.8.1
+* CUDA 11.1
+* TorchVision 1.9.1
+* OpenCV 4.4.0.46
+* Tensorrt 7.2.2.3
 
 #### Create environment and activate
 ```bash
-conda create --name smalltrack python=3.7
-source activate smalltrack
+conda create --name GLAD python=3.7
+source activate GLAD
 ```
 
-#### Install numpy/pytorch/opencv
+#### Install numpy/pytorch/opencv/tensorrt
 ```bash
 conda install numpy
-conda install pytorch=1.3.1 torchvision cudatoolkit=10.1 -c pytorch
-pip install opencv-python
+conda install pytorch=1.8.1 torchvision cudatoolkit=11.1 -c pytorch
+pip install opencv-python==4.4.0.46
+pip install tensorrt==7.2.2.3
 ```
 
-#### Install other requirements
-```bash
-pip install pyyaml yacs tqdm colorama matplotlib cython tensorboard future mpi4py optuna
-```
-
-#### Build extensions
-```bash
-python setup.py build_ext --inplace
-```
+## More Information
+About tensorrt please see the readme in [home page.](https://github.com/wang-xinyu/tensorrtx)
+the YOLOv5 version is v6.0 in this project
 
 
-## Try with scripts
-```bash
-bash install.sh /path/to/your/conda siamban
-```
 
